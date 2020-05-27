@@ -83,7 +83,10 @@ def get_all_details():
         links = json.load(f)["data"]
     all_details = {}
     for link in links:
-        details = get_detail(link)
+        try:
+            details = get_detail(link)
+        except:
+            continue
         for key_detail, value_detail in details.items():
             if key_detail not in all_details:
                 all_details[key_detail] = {}
