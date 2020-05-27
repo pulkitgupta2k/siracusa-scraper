@@ -97,5 +97,53 @@ def get_all_details():
     with open("details.json", "w") as f:
         json.dump(all_details, f)
 
+def get_dates():
+    dates = []
+    with open("details.json", "r") as f:
+        products_json = json.load(f)
+    for key, value in products_json.items():
+        for d in value.keys():
+            if d not in dates:
+                dates.append(d)
+    dates.sort()
+    # print(dates)
+    return dates
+
+def make_matrix():
+    ret_matrix = []
+    with open("details.json", "r") as f:
+        products_json = json.load(f)
+    dates = get_dates()
+    heading = ["COD", "DESCRIZIONE ARTICOLO", "PROVEN", "MIS", "CAT"]
+    heading.extend(dates)
+    ret_matrix.append(heading)
+    for key, value in products_json.items():
+        row = []
+        row.extend(key.split(":"))
+        dates_row = [""] * len(dates)
+        for date_key, pre_value in value.items():
+            index = dates.index(date_key)
+            dates_row[index] = pre_value
+        row.extend(dates_row)
+        ret_matrix.append(row)
+    return ret_matrix
+
+
+def gsheet_load(array):
+    scope = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.file'
+    ]
+    file_name = 'client_key.json'
+    creds = ServiceAccountCredentials.from_json_keyfile_name(file_name,scope)
+    client = gspread.authorize(creds)
+    sheet = client.open('Siracusa.it').sheet1
+    sheet.clear()
+    append_rows(sheet,array)
+    print("MODIFIED")
+
+
 def driver():
     get_all_details()
+    matrix = make_matrix()
+    gsheet_load(matrix)
