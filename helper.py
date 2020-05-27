@@ -50,9 +50,12 @@ def make_date_json():
     date_json["data"] = []
     for single_date in jump_by_month(start_date, end_date):
         date_var = single_date.strftime("%Y/%m/%d")
-        links = get_page_links(date_var)
-        date_json["data"].append(links)
-        print(date_var)
+        try:
+            links = get_page_links(date_var)
+            date_json["data"].append(links)
+            print(date_var)
+        except:
+            pass
     with open ("date.json") as f:
         json.dump(date_json, f)
     
