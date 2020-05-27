@@ -56,7 +56,7 @@ def make_date_json():
             print(date_var)
         except:
             pass
-    with open ("date.json", "w") as f:
+    with open ("links.json", "w") as f:
         json.dump(date_json, f)
     
 def get_detail(link):
@@ -75,10 +75,24 @@ def get_detail(link):
         cat = col[4].text.strip()
         pre = col[-1].text.strip()
         name = "{}:{}:{}:{}:{}".format(cod, desc, proven, mis, cat)
-        ret_det[name] = "{}:{}".format(date_var, pre)
+        ret_det[name] ="{}:{}".format(date_var, pre)
     return ret_det
 
+def get_all_details():
+    with open ("links.json") as f:
+        links = json.load(f)["data"]
+    all_details = {}
+    for link in links:
+        details = get_detail(link)
+        for key_detail, value_detail in details.items():
+            if key_detail not in all_details:
+                all_details[key_detail] = {}
+            date_var = value_detail.split(":")[0]
+            pre_var = value_detail.split(":")[1]
+            all_details[key_detail][date_var] = pre_var
+        print(link)
+    with open("details.json", "w") as f:
+        json.dump(all_details, f)
+
 def driver():
-    # get_page_links("2015/01/01")
-    make_date_json()
-    # pprint(get_detail("https://www.comune.siracusa.it/index.php/it/la-citta/siracusa-eventi/eventi-del-giorno/icalrepeat.detail/2017/12/18/5550/491/listino-prezzi-del-18-dicembre"))
+    get_all_details()
