@@ -106,7 +106,6 @@ def get_dates():
             if d not in dates:
                 dates.append(d)
     dates.sort()
-    # print(dates)
     return dates
 
 def make_matrix():
