@@ -52,13 +52,33 @@ def make_date_json():
         date_var = single_date.strftime("%Y/%m/%d")
         try:
             links = get_page_links(date_var)
-            date_json["data"].append(links)
+            date_json["data"].extend(links)
             print(date_var)
         except:
             pass
-    with open ("date.json") as f:
+    with open ("date.json", "w") as f:
         json.dump(date_json, f)
     
+def get_detail(link):
+    soup = getSoup(link)
+    soup = soup.find("div", {"class": "jev_evdt_desc"}).find("table",{"border": "1"})
+    rows = soup.findAll("tr")[1:]
+    ret_det = {}
+    date_var = link.split("/")
+    date_var = "{}/{}/{}".format(date_var[-6], date_var[-5], date_var[-4])
+    for row in rows:
+        col = row.findAll("td")
+        cod = col[0].text.strip()
+        desc = col[1].text.strip()
+        proven = col[2].text.strip()
+        mis = col[3].text.strip()
+        cat = col[4].text.strip()
+        pre = col[-1].text.strip()
+        name = "{}:{}:{}:{}:{}".format(cod, desc, proven, mis, cat)
+        ret_det[name] = "{}:{}".format(date_var, pre)
+    return ret_det
+
 def driver():
     # get_page_links("2015/01/01")
     make_date_json()
+    # pprint(get_detail("https://www.comune.siracusa.it/index.php/it/la-citta/siracusa-eventi/eventi-del-giorno/icalrepeat.detail/2017/12/18/5550/491/listino-prezzi-del-18-dicembre"))
